@@ -6,6 +6,12 @@ module edge_detect (
     output wire             leading_edge_detect
     );
 
-    assign leading_edge_detect = 0;
+	reg q1, q2;
 
+	always @(posedge clk) begin
+		q1 <= signal;
+		q2 <= q1;
+	end
+
+	assign leading_edge_detect = q1 & (q1 ^ q2);
 endmodule
