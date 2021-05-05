@@ -24,12 +24,13 @@ module frequency_counter #(
     localparam STATE_TENS   = 1;
     localparam STATE_UNITS  = 2;
     localparam STATE_FLUSH  = 3;
+
     reg [2:0] state = STATE_COUNT;
     reg [LOCAL_BITS:0] edge_counter;
     reg [LOCAL_SEGMENTS:0] ten_count;
     reg [LOCAL_SEGMENTS:0] unit_count;
     reg [BITS:0] clk_counter;
-
+    reg [BITS:0] update_period;
     reg load_enable;
     wire leading_edge_detect;
 
@@ -53,7 +54,10 @@ module frequency_counter #(
             clk_counter <= 0;
             ten_count <= 0;
             unit_count <= 0;
-        end else begin
+	    update_period <= UPDATE_PERIOD;
+	end else if (period_load) begin
+            update_period <= period;
+	end else begin
             case(state)
                 STATE_COUNT: begin
                     // count edges and clock cycles
@@ -64,7 +68,7 @@ module frequency_counter #(
                             end
                     end
                     // if clock cycles > UPDATE_PERIOD then go to next state
-                    if (clk_counter > UPDATE_PERIOD) begin
+                    if (clk_counter >= update_period) begin
                             state <= STATE_TENS;
                     end
                 end
