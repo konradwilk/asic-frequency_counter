@@ -57,12 +57,12 @@ module seven_segment (
 					segments <= ~local_segments;
 				else
 					segments <= local_segments;
+				if (load) begin
+					copy_ten_count <= ten_count;
+					copy_unit_count <= unit_count;
+				end
 			end
 	end
-	always @(load) begin
-               copy_ten_count <= ten_count;
-               copy_unit_count <= unit_count;
-       end
 
 	seg7 seg7(.counter(values), .segments(local_segments));
 endmodule
