@@ -9,11 +9,10 @@ module frequency_counter #(
     input wire              clk,
     input wire              reset_n,
     input wire              signal,
-
-// Don't exist on the FPGA
-//    input wire [BITS-1:0]   period,
-//    input wire              period_load,
-
+`ifndef FPGA
+    input wire [BITS-1:0]   period,
+    input wire              period_load,
+`endif
     output wire [6:0]       segments,
     output wire             digit
     );
@@ -26,7 +25,6 @@ module frequency_counter #(
     localparam STATE_UNITS  = 2;
     localparam STATE_FLUSH  = 3;
     localparam STATE_TEST   = 4;
-    localparam INVERT	    = 1;
     reg [2:0] state = STATE_COUNT;
     reg [LOCAL_BITS:0] edge_counter;
     reg [LOCAL_SEGMENTS:0] ten_count;
@@ -36,7 +34,9 @@ module frequency_counter #(
     reg load_enable;
     wire leading_edge_detect;
     wire reset;
+    wire slow_clk;
 
+`ifdef FPGA
     // For FPGA we set the period to UPDATE_PERIOD:
     wire [BITS-1:0] period;
     // And don't touch the enable bit.
@@ -46,15 +46,22 @@ module frequency_counter #(
     assign reset = !reset_n;
     assign period = UPDATE_PERIOD;
 
-    wire slow_clk;
+    localparam INVERT	    = 1;
+`else
+    localparam INVERT	    = 0;
     // Normal execution:
-    //assign reset = reset_n;
+    assign reset = reset_n;
+ `endif
 
     edge_detect Edge(.clk(clk),
                      .signal(signal),
                      .leading_edge_detect(leading_edge_detect));
 
+`ifdef FPGA
     clkdiv SlowClock(.clk(clk), .clkout(slow_clk));
+`else
+    assign slow_clk = clk;
+`endif
 
     seven_segment SevenSegment(.clk(slow_clk),
                                .reset(reset),
@@ -68,8 +75,6 @@ module frequency_counter #(
 
     always @(posedge clk) begin
         if(reset) begin
-	    // For FPGA, we are going to be in STATE_TEST to check the PMOD
-	    // connection.
             state <= STATE_COUNT;
             load_enable <= 0;
 	    edge_counter <= 0;
@@ -82,7 +87,6 @@ module frequency_counter #(
 	end else begin
             case(state)
 		STATE_TEST: begin
-		    // FPGA
                     ten_count <= 2;
 		    unit_count <= 3;
                     load_enable <= 1'b1;

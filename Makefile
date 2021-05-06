@@ -45,7 +45,7 @@ show_synth_%: src/%.v
 	yosys -p "read_verilog $<; proc; opt; show -colors 2 -width -signed"
 
 %.json: $(SOURCES)
-	yosys -l fpga/yosys.log -p 'synth_ice40 -top frequency_counter -json $(PROJECT).json' $(SOURCES)
+	yosys -l fpga/yosys.log -DFPGA=1 -p 'synth_ice40 -top frequency_counter -json $(PROJECT).json' $(SOURCES)
 
 %.asc: %.json $(ICEBREAKER_PIN_DEF) 
 	nextpnr-ice40 -l fpga/nextpnr.log --seed $(SEED) --freq 20 --package $(ICEBREAKER_PACKAGE) --$(ICEBREAKER_DEVICE) --asc $@ --pcf $(ICEBREAKER_PIN_DEF) --json $<
