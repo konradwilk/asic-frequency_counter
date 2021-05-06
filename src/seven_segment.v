@@ -39,29 +39,24 @@ module seven_segment (
 
 	reg [3:0] copy_ten_count;
 	reg [3:0] copy_unit_count;
-	reg select_output = 0;
 	wire [3:0] values;
 
-	assign values = (select_output ? copy_unit_count : copy_ten_count);
+	assign values = digit ? copy_unit_count : copy_ten_count;
 
 	always @(posedge clk) begin
 			if (reset) begin
-					select_output <= 0;
 					copy_ten_count <= 0;
 					copy_unit_count <= 0;
 					digit <= 0;
-			end else
+			end else begin
 				// Flips back and forth.
-				select_output <= !select_output;
+				digit <= !digit;
+			end
 	end
-
-	always @(posedge load) begin
-		copy_ten_count <= ten_count;
-		copy_unit_count <= unit_count;
-	end
-	always @(select_output) begin
-		digit <= select_output;
-	end
+	always @(load) begin
+               copy_ten_count <= ten_count;
+               copy_unit_count <= unit_count;
+       end
 
 	seg7 seg7(.counter(values), .segments(segments));
 endmodule
