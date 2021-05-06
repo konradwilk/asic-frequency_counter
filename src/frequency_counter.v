@@ -31,8 +31,8 @@ module frequency_counter #(
     reg [LOCAL_BITS:0] edge_counter;
     reg [LOCAL_SEGMENTS:0] ten_count;
     reg [LOCAL_SEGMENTS:0] unit_count;
-    reg [BITS:0] clk_counter;
-    reg [BITS:0] update_period;
+    reg [BITS-1:0] clk_counter;
+    reg [BITS-1:0] update_period;
     reg load_enable;
     wire leading_edge_detect;
     wire reset;
@@ -115,7 +115,7 @@ module frequency_counter #(
 
                 STATE_UNITS: begin
                     // what is left in edge counter is units
-                    unit_count <= edge_counter;
+                    unit_count <= edge_counter[3:0];
                     // update the display
                     load_enable <= 1'b1;
                     // go back to counting
