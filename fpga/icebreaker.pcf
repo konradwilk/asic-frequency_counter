@@ -28,10 +28,10 @@ set_io -nowarn segments[0]  4
 set_io -nowarn segments[1]  2
 set_io -nowarn segments[2]  47
 set_io -nowarn segments[3]  45
-set_io -nowarn segments[4]  43
-set_io -nowarn segments[5]  38
-set_io -nowarn segments[6]  34
-set_io -nowarn digit        31
+set_io -nowarn segments[4]  3
+set_io -nowarn segments[5]  48
+set_io -nowarn segments[6]  46
+set_io -nowarn digit        44
 
 # PMOD 1A
 set_io -nowarn P1A1        4
