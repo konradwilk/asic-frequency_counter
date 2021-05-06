@@ -26,7 +26,7 @@ module frequency_counter #(
     localparam STATE_UNITS  = 2;
     localparam STATE_FLUSH  = 3;
     localparam STATE_TEST   = 4;
-
+    localparam INVERT	    = 1;
     reg [2:0] state = STATE_COUNT;
     reg [LOCAL_BITS:0] edge_counter;
     reg [LOCAL_SEGMENTS:0] ten_count;
@@ -59,7 +59,9 @@ module frequency_counter #(
                                .ten_count(ten_count),
                                .unit_count(unit_count),
                                .segments(segments),
-                               .digit(digit));
+                               .digit(digit),
+			       .invert(INVERT));
+
 
     always @(posedge clk) begin
         if(reset) begin

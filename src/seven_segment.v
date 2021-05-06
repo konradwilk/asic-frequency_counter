@@ -34,12 +34,14 @@ module seven_segment (
     input wire [3:0]    ten_count,
     input wire [3:0]    unit_count,
     output reg [6:0]    segments,
-    output reg          digit
+    output reg          digit,
+    input wire		invert
 );
 
 	reg [3:0] copy_ten_count;
 	reg [3:0] copy_unit_count;
 	wire [3:0] values;
+	reg [6:0] local_segments;
 
 	assign values = digit ? copy_unit_count : copy_ten_count;
 
@@ -51,6 +53,10 @@ module seven_segment (
 			end else begin
 				// Flips back and forth.
 				digit <= !digit;
+				if (invert)
+					segments <= ~local_segments;
+				else
+					segments <= local_segments;
 			end
 	end
 	always @(load) begin
@@ -58,5 +64,5 @@ module seven_segment (
                copy_unit_count <= unit_count;
        end
 
-	seg7 seg7(.counter(values), .segments(segments));
+	seg7 seg7(.counter(values), .segments(local_segments));
 endmodule
