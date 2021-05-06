@@ -1,3 +1,4 @@
 0 count
 1 tens
 2 units
+3 flush
