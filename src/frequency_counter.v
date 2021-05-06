@@ -7,7 +7,7 @@ module frequency_counter #(
     localparam BITS = 12
 )(
     input wire              clk,
-    input wire              reset,
+    input wire              reset_n,
     input wire              signal,
 
     input wire [BITS-1:0]   period,
@@ -33,6 +33,9 @@ module frequency_counter #(
     reg [BITS:0] update_period;
     reg load_enable;
     wire leading_edge_detect;
+    wire reset;
+
+    assign reset = reset_n;
 
     edge_detect Edge(.clk(clk),
                      .signal(signal),
