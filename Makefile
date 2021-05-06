@@ -1,6 +1,6 @@
 # FPGA variables
 PROJECT = fpga/frequency_counter
-SOURCES= src/frequency_counter.v src/seven_segment.v src/edge_detect.v
+SOURCES= src/frequency_counter.v src/seven_segment.v src/edge_detect.v src/clkdiv.v
 ICEBREAKER_DEVICE = up5k
 ICEBREAKER_PIN_DEF = fpga/icebreaker.pcf
 ICEBREAKER_PACKAGE = sg48
@@ -21,13 +21,13 @@ test_edge_detect:
 test_frequency_counter:
 	rm -rf sim_build/
 	mkdir sim_build/
-	iverilog -o sim_build/sim.vvp -s frequency_counter -s dump -g2012 src/frequency_counter.v src/edge_detect.v src/seven_segment.v test/dump_frequency_counter.v 
+	iverilog -o sim_build/sim.vvp -s frequency_counter -s dump -g2012 src/frequency_counter.v src/edge_detect.v src/seven_segment.v test/dump_frequency_counter.v src/clkdiv.v
 	PYTHONOPTIMIZE=${NOASSERT} TESTCASE=test_all MODULE=test.test_frequency_counter vvp -M $$(cocotb-config --prefix)/cocotb/libs -m libcocotbvpi_icarus sim_build/sim.vvp
 
 test_frequency_counter_with_period:
 	rm -rf sim_build/
 	mkdir sim_build/
-	iverilog -o sim_build/sim.vvp -s frequency_counter -s dump -g2012 src/frequency_counter.v src/edge_detect.v src/seven_segment.v test/dump_frequency_counter.v 
+	iverilog -o sim_build/sim.vvp -s frequency_counter -s dump -g2012 src/frequency_counter.v src/edge_detect.v src/seven_segment.v test/dump_frequency_counter.v src/clkdiv.v
 	PYTHONOPTIMIZE=${NOASSERT} MODULE=test.test_frequency_counter vvp -M $$(cocotb-config --prefix)/cocotb/libs -m libcocotbvpi_icarus sim_build/sim.vvp
 
 test_seven_segment:

@@ -46,6 +46,7 @@ module frequency_counter #(
     assign reset = !reset_n;
     assign period = UPDATE_PERIOD;
 
+    wire slow_clk;
     // Normal execution:
     //assign reset = reset_n;
 
@@ -53,7 +54,9 @@ module frequency_counter #(
                      .signal(signal),
                      .leading_edge_detect(leading_edge_detect));
 
-    seven_segment SevenSegment(.clk(clk),
+    clkdiv SlowClock(.clk(clk), .clkout(slow_clk));
+
+    seven_segment SevenSegment(.clk(slow_clk),
                                .reset(reset),
                                .load(load_enable),
                                .ten_count(ten_count),
