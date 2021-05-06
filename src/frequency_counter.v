@@ -10,8 +10,9 @@ module frequency_counter #(
     input wire              reset_n,
     input wire              signal,
 
-    input wire [BITS-1:0]   period,
-    input wire              period_load,
+// Don't exist on the FPGA
+//    input wire [BITS-1:0]   period,
+//    input wire              period_load,
 
     output wire [6:0]       segments,
     output wire             digit
@@ -24,6 +25,7 @@ module frequency_counter #(
     localparam STATE_TENS   = 1;
     localparam STATE_UNITS  = 2;
     localparam STATE_FLUSH  = 3;
+    localparam STATE_TEST   = 4;
 
     reg [2:0] state = STATE_COUNT;
     reg [LOCAL_BITS:0] edge_counter;
@@ -35,7 +37,17 @@ module frequency_counter #(
     wire leading_edge_detect;
     wire reset;
 
-    assign reset = reset_n;
+    // For FPGA we set the period to UPDATE_PERIOD:
+    wire [BITS-1:0] period;
+    // And don't touch the enable bit.
+    reg period_load = 1'b0;
+
+    // Invert the reset
+    assign reset = !reset_n;
+    assign period = UPDATE_PERIOD;
+
+    // Normal execution:
+    //assign reset = reset_n;
 
     edge_detect Edge(.clk(clk),
                      .signal(signal),
@@ -51,7 +63,9 @@ module frequency_counter #(
 
     always @(posedge clk) begin
         if(reset) begin
-            state <= STATE_COUNT;
+	    // For FPGA, we are going to be in STATE_TEST to check the PMOD
+	    // connection.
+            state <= STATE_TEST;
             load_enable <= 1'b0;
 	    edge_counter <= 0;
             clk_counter <= 0;
@@ -62,6 +76,14 @@ module frequency_counter #(
             update_period <= period;
 	end else begin
             case(state)
+		STATE_TEST: begin
+		    // FPGA
+                    ten_count <= 2;
+		    unit_count <= 3;
+                    load_enable <= 1'b1;
+		    // To see under GTKWave that it is working right.
+                    clk_counter <= clk_counter + 1;
+	        end
                 STATE_COUNT: begin
                     // count edges and clock cycles
                     clk_counter <= clk_counter + 1;
