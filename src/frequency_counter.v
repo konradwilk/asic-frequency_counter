@@ -70,8 +70,8 @@ module frequency_counter #(
         if(reset) begin
 	    // For FPGA, we are going to be in STATE_TEST to check the PMOD
 	    // connection.
-            state <= STATE_TEST;
-            load_enable <= 1'b0;
+            state <= STATE_COUNT;
+            load_enable <= 0;
 	    edge_counter <= 0;
             clk_counter <= 0;
             ten_count <= 0;
